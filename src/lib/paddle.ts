@@ -4,13 +4,17 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 export type PaddleEnv = "sandbox" | "production";
 export const paddleEnv = (): PaddleEnv => ((process.env.NEXT_PUBLIC_PADDLE_ENV || process.env.PADDLE_ENV) === "production" ? "production" : "sandbox");
 
-/** Tous les réglages nécessaires sont-ils présents ? (on ne renvoie jamais leurs valeurs) */
+/** Une clé est utilisable si elle est présente et ne contient que des caractères imprimables simples
+ *  (une clé copiée masquée « ••• » ou avec des espaces au milieu est refusée). */
+const usableKey = (v: string | undefined) => /^[\x21-\x7e]+$/.test((v ?? "").trim());
+
+/** Tous les réglages nécessaires sont-ils présents et utilisables ? (on ne renvoie jamais leurs valeurs) */
 export function billingStatus() {
   return {
-    apiKey: Boolean(process.env.PADDLE_API_KEY),
-    webhookSecret: Boolean(process.env.PADDLE_WEBHOOK_SECRET),
-    clientToken: Boolean(process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN),
-    serviceRole: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
+    apiKey: usableKey(process.env.PADDLE_API_KEY),
+    webhookSecret: usableKey(process.env.PADDLE_WEBHOOK_SECRET),
+    clientToken: usableKey(process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN),
+    serviceRole: usableKey(process.env.SUPABASE_SERVICE_ROLE_KEY),
     env: paddleEnv(),
   };
 }

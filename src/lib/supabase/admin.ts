@@ -6,7 +6,7 @@ import { createClient } from "@supabase/supabase-js";
  * toujours côté serveur. La clé n'est JAMAIS exposée au navigateur (pas de préfixe NEXT_PUBLIC_).
  */
 export function createServiceClient() {
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const key = (process.env.SUPABASE_SERVICE_ROLE_KEY ?? "").trim();
   if (!key) throw new Error("SUPABASE_SERVICE_ROLE_KEY missing");
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, key, { auth: { persistSession: false, autoRefreshToken: false } });
 }
