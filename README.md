@@ -37,6 +37,7 @@
    - Checkout > Checkout settings : lien de paiement par défaut = `https://VOTRE-DOMAINE/app/billing`.
 4. Vercel > Environment Variables : `NEXT_PUBLIC_PADDLE_ENV=sandbox`, `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`, `PADDLE_API_KEY`, `PADDLE_WEBHOOK_SECRET`, `SUPABASE_SERVICE_ROLE_KEY` (+ variables légales). Redéployer.
 5. `/admin/billing` → « Créer les produits et prix dans Paddle ».
+   - Les clés doivent être copiées **révélées** (jamais la version masquée « ••• »). Après toute modification d'une variable Vercel, redéployer.
 6. Tester avec une carte de test Paddle (sandbox) depuis `/app/billing`.
 7. Passage en réel : refaire 3 à 5 sur https://vendors.paddle.com avec `NEXT_PUBLIC_PADDLE_ENV=production`, après approbation du compte et du domaine par Paddle.
 
