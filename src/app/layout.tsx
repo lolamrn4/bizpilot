@@ -7,6 +7,7 @@ import { SwRegister } from "@/components/SwRegister";
 export async function generateMetadata(): Promise<Metadata> {
   const { d } = await getDict();
   return {
+    metadataBase: new URL("https://www.bizpilotappgn.xyz"),
     title: { default: d.meta.title, template: `%s · ${d.meta.title}` },
     description: d.meta.description,
     applicationName: "Biz Pilot Digital",

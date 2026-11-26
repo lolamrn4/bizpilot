@@ -797,6 +797,18 @@ export const en: Dict = {
     call: "Call",
     noIntlPhone: "Without an international number (+…), WhatsApp will let you pick the contact.",
   },
+  guides: {
+    title: "Practical guides",
+    subtitle: "Simple advice to run your small business: sales, stock, pricing, customer balances and profit.",
+    read: "Read the guide",
+    all: "All guides",
+    otherLang: "Lire en français",
+    ctaTitle: "Try Biz Pilot Digital for free",
+    ctaText: "Sales, stock, expenses and customer balances on your phone. No accounting knowledge needed.",
+    ctaButton: "Start for free",
+    disclaimer: "This guide gives general information. It doesn't replace advice from an accountant or adviser.",
+    footer: "Guides",
+  },
   pwa: {
     offlineTitle: "You are offline",
     offlineText: "Check your internet connection and try again. Your data is safe.",

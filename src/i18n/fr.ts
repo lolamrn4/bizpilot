@@ -795,6 +795,18 @@ export const fr = {
     call: "Appeler",
     noIntlPhone: "Sans numéro au format international (+…), WhatsApp vous laissera choisir le contact.",
   },
+  guides: {
+    title: "Guides pratiques",
+    subtitle: "Des conseils simples pour gérer votre commerce : ventes, stock, prix, crédits clients et bénéfice.",
+    read: "Lire le guide",
+    all: "Tous les guides",
+    otherLang: "Read in English",
+    ctaTitle: "Essayez Biz Pilot Digital gratuitement",
+    ctaText: "Ventes, stock, dépenses et crédits clients sur votre téléphone. Sans connaissances en comptabilité.",
+    ctaButton: "Commencer gratuitement",
+    disclaimer: "Ce guide donne des informations générales. Il ne remplace pas l'avis d'un comptable ou d'un conseiller.",
+    footer: "Guides",
+  },
   pwa: {
     offlineTitle: "Vous êtes hors ligne",
     offlineText: "Vérifiez votre connexion internet puis réessayez. Vos données sont en sécurité.",
