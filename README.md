@@ -1,4 +1,4 @@
-# Biz Pilot Digital — Phases 1 à 4
+# Biz Pilot Digital — Phases 1 à 7
 
 > Gérez votre entreprise, comprenez vos chiffres, prenez de meilleures décisions. — *Think Smarter, Grow Better.*
 
