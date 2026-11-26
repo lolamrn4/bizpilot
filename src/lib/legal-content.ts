@@ -5,7 +5,8 @@
  */
 export const LEGAL = {
   entity: process.env.NEXT_PUBLIC_LEGAL_ENTITY || "[Raison sociale à compléter]",
-  registration: process.env.NEXT_PUBLIC_LEGAL_REGISTRATION || "[N° d'immatriculation à compléter]",
+  // Facultatif : un entrepreneur individuel sans immatriculation n'affiche rien.
+  registration: process.env.NEXT_PUBLIC_LEGAL_REGISTRATION || "",
   address: process.env.NEXT_PUBLIC_LEGAL_ADDRESS || "[Adresse à compléter]",
   email: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "[E-mail de support à compléter]",
   country: process.env.NEXT_PUBLIC_LEGAL_COUNTRY || "[Pays à compléter]",
@@ -50,7 +51,7 @@ export const legalContent: Record<"fr" | "en", Record<LegalDoc, Section[]>> = {
       { h: "8. Sécurité", p: ["Chaque compte n'accède qu'aux données de ses entreprises (contrôle d'accès dans la base de données), connexions chiffrées (HTTPS), clés secrètes conservées uniquement côté serveur."] },
     ],
     notice: [
-      { h: "Éditeur", p: [`${L.entity} — ${L.registration} — ${L.address}. Contact : ${L.email}.`] },
+      { h: "Éditeur", p: [`${[L.entity, L.registration, L.address].filter(Boolean).join(" — ")}. Contact : ${L.email}.`] },
       { h: "Marque", p: ["Biz Pilot Digital est une marque exploitée par l'Éditeur."] },
       { h: "Hébergement", p: ["Application : Vercel Inc. (États-Unis). Base de données : Supabase Inc. (États-Unis). Coordonnées complètes sur leurs sites officiels."] },
       { h: "Paiements", p: ["Les paiements sont traités par Paddle.com Market Ltd, revendeur officiel (Merchant of Record) de nos abonnements."] },
@@ -86,7 +87,7 @@ export const legalContent: Record<"fr" | "en", Record<LegalDoc, Section[]>> = {
       { h: "8. Security", p: ["Each account can only access its own businesses' data (access control in the database), encrypted connections (HTTPS), secret keys kept on the server only."] },
     ],
     notice: [
-      { h: "Publisher", p: [`${L.entity} — ${L.registration} — ${L.address}. Contact: ${L.email}.`] },
+      { h: "Publisher", p: [`${[L.entity, L.registration, L.address].filter(Boolean).join(" — ")}. Contact: ${L.email}.`] },
       { h: "Brand", p: ["Biz Pilot Digital is a brand operated by the Publisher."] },
       { h: "Hosting", p: ["Application: Vercel Inc. (USA). Database: Supabase Inc. (USA). Full details on their official websites."] },
       { h: "Payments", p: ["Payments are processed by Paddle.com Market Ltd, the Merchant of Record for our subscriptions."] },
