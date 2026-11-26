@@ -7,7 +7,7 @@ import { PeriodFilter } from "@/components/PeriodFilter";
 import type { Expense, ExpenseCategory } from "@/lib/types";
 
 export default async function ExpensesPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
-  const { supabase, business, entitlements } = await getAppContext();
+  const { supabase, business, entitlements, isManager } = await getAppContext();
   const { d, lang } = await getDict();
   const sp = await searchParams;
   const p = resolvePeriod(business.timezone, sp.period, sp.from, sp.to);
@@ -44,7 +44,7 @@ export default async function ExpensesPage({ searchParams }: { searchParams: Pro
         <>
           <div className="card divide-y divide-ink-100">
             {rows.map((e) => (
-              <Link key={e.id} href={`/app/expenses/${e.id}`} className="flex items-center justify-between gap-3 px-4 py-3.5 hover:bg-ink-50">
+              <Link key={e.id} href={isManager ? `/app/expenses/${e.id}` : "#"} aria-disabled={!isManager} className="flex items-center justify-between gap-3 px-4 py-3.5 hover:bg-ink-50">
                 <div className="min-w-0">
                   <p className="truncate font-semibold">{e.name}{e.receipt_path ? " 📎" : ""}</p>
                   <p className="truncate text-xs text-ink-500">{formatDate(e.expense_date, lang)} · {label(e.expense_categories)}</p>

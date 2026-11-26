@@ -86,3 +86,10 @@ export async function deletePaymentAction(fd: FormData) {
   await supabase.from("sale_payments").delete().eq("id", String(fd.get("id")));
   revalidatePath(`/app/sales/${sale}`);
 }
+
+export async function regenerateReceiptLinkAction(fd: FormData) {
+  const { supabase } = await getAppContext();
+  const id = String(fd.get("id"));
+  await supabase.rpc("regenerate_receipt_link", { p_sale: id });
+  revalidatePath(`/app/sales/${id}`);
+}

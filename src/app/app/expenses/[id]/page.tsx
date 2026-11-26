@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getAppContext, can } from "@/lib/session";
 import { getDict } from "@/i18n/server";
 import { todayIn } from "@/lib/periods";
@@ -10,7 +10,8 @@ import { deleteExpenseAction } from "../actions";
 
 export default async function ExpensePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { supabase, business, entitlements } = await getAppContext();
+  const { supabase, business, entitlements, isManager } = await getAppContext();
+  if (!isManager) redirect("/app/expenses");
   const { d } = await getDict();
   const { data } = await supabase.from("expenses").select("*").eq("id", id).eq("business_id", business.id).maybeSingle();
   if (!data) notFound();

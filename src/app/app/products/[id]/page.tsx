@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getAppContext } from "@/lib/session";
 import { getDict } from "@/i18n/server";
 import { formatDate, formatNumber } from "@/lib/money";
@@ -11,7 +11,8 @@ import { StockBadge } from "@/components/StockBadge";
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { supabase, business } = await getAppContext();
+  const { supabase, business, isManager } = await getAppContext();
+  if (!isManager) redirect("/app/products");
   const { d, lang } = await getDict();
   const { data } = await supabase.from("products").select("*").eq("id", id).eq("business_id", business.id).maybeSingle();
   if (!data) notFound();
@@ -37,7 +38,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         <h2 className="h2 mb-3">{d.products.movements}</h2>
         <div className="table-wrap">
           <table className="table">
-            <thead><tr><th>{d.common.date}</th><th>{d.common.filter}</th><th className="text-right">{d.products.movementQty}</th><th>{d.common.note}</th></tr></thead>
+            <thead><tr><th>{d.common.date}</th><th>{d.common.filter}</th><th className="!text-right">{d.products.movementQty}</th><th>{d.common.note}</th></tr></thead>
             <tbody>
               {(moves ?? []).map((m) => (
                 <tr key={m.id}>

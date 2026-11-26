@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getAppContext } from "@/lib/session";
 import { getDict } from "@/i18n/server";
 import { ProductForm } from "../ProductForm";
 
 export default async function NewProductPage() {
-  const { business } = await getAppContext();
+  const { business, isManager } = await getAppContext();
+  if (!isManager) redirect("/app/products");
   const { d } = await getDict();
   return (
     <div className="space-y-4">

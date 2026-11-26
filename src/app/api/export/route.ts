@@ -16,6 +16,7 @@ const pdfSafe = (v: string) => v.replace(/[  ]/g, " ").replace(/[→]/g, "-")
 
 export async function GET(req: NextRequest) {
   const { supabase, business, entitlements } = await getAppContext();
+  if (!(await getAppContext()).isManager) return new NextResponse("Forbidden", { status: 403 });
   const { d, lang } = await getDict();
   // Droit vérifié côté serveur (la formule est lue en base, pas dans l'interface).
   if (!can(entitlements, "exports")) return NextResponse.json({ error: d.reports.exportLocked }, { status: 403 });

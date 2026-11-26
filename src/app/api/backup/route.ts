@@ -6,6 +6,7 @@ export const dynamic = "force-dynamic";
 /** Sauvegarde complète des données de l'entreprise (toutes formules) — lecture sous RLS. */
 export async function GET() {
   const { supabase, business } = await getAppContext();
+  if (!(await getAppContext()).isManager) return new NextResponse("Forbidden", { status: 403 });
   const b = business.id;
   const [products, movements, sales, payments, expenses, categories] = await Promise.all([
     supabase.from("products").select("*").eq("business_id", b),

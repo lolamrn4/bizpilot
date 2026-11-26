@@ -4,6 +4,8 @@ import { Logo } from "@/components/Logo";
 import { LangSwitch } from "@/components/LangSwitch";
 import { createClient } from "@/lib/supabase/server";
 import { formatMoney } from "@/lib/money";
+import { LegalFooter } from "@/components/LegalFooter";
+import { getDisplayPrices } from "@/lib/prices";
 
 const icons = [
   "M3 3h18v4H3zM5 7v13h14V7M9 12h6",
@@ -17,8 +19,9 @@ const icons = [
 export default async function Landing() {
   const { d, lang } = await getDict();
   const supabase = await createClient();
-  const { data: plans } = await supabase.from("plans").select("code, price_gnf").order("sort_order");
+  const { data: plans } = await supabase.from("plans").select("code, price_gnf").eq("is_active", true).order("sort_order");
   const feats = [1, 2, 3, 4, 5, 6] as const;
+  const PRICE_GRID = await getDisplayPrices(supabase);
   return (
     <main className="min-h-dvh bg-white">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
@@ -68,14 +71,15 @@ export default async function Landing() {
                 <div key={code} className={`card flex flex-col p-6 ${code === "premium" ? "ring-2 ring-brand-500" : ""}`}>
                   <h3 className="text-lg font-bold">{d.plans[code]}</h3>
                   <p className="mt-2 text-2xl font-extrabold text-ink-900">
-                    {formatMoney(p.price_gnf, "GNF", lang)}
+                    {code === "free" ? "0" : formatMoney(PRICE_GRID[code].USD, "USD", lang)}
                     <span className="text-sm font-medium text-ink-500"> {d.landing.perMonth}</span>
                   </p>
+                  {code !== "free" && <p className="text-xs text-ink-500">{formatMoney(PRICE_GRID[code].EUR, "EUR", lang)} · {formatMoney(PRICE_GRID[code].GBP, "GBP", lang)} · {formatMoney(PRICE_GRID[code].GNF ?? p.price_gnf, "GNF", lang)}</p>}
                   <p className="mt-3 flex-1 text-sm text-ink-600">{d.plans[`${code}Desc`]}</p>
                   {code === "free" ? (
                     <Link href="/signup" className="btn-primary mt-5">{d.landing.start}</Link>
                   ) : (
-                    <span className="btn-secondary mt-5 cursor-default opacity-70">{d.landing.soon}</span>
+                    <Link href="/signup" className="btn-secondary mt-5">{d.landing.start}</Link>
                   )}
                 </div>
               );
@@ -84,9 +88,7 @@ export default async function Landing() {
         </div>
       </section>
 
-      <footer className="border-t border-ink-100 py-8 text-center text-sm text-ink-500">
-        © {new Date().getFullYear()} {d.landing.footer} · {d.brand.slogan2}
-      </footer>
+      <LegalFooter />
     </main>
   );
 }

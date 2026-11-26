@@ -1,4 +1,4 @@
-import { getAppContext, can } from "@/lib/session";
+import { requireManager, can } from "@/lib/session";
 import { getDict } from "@/i18n/server";
 import { fmt } from "@/i18n";
 import { resolvePeriod } from "@/lib/periods";
@@ -8,7 +8,7 @@ import { LockNote } from "@/components/forms";
 import { SECTIONS, sectionTable, sectionTitle, type ReportData } from "@/lib/report";
 
 export default async function ReportsPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
-  const { supabase, business, entitlements } = await getAppContext();
+  const { supabase, business, entitlements } = await requireManager();
   const { d, lang } = await getDict();
   const sp = await searchParams;
   const p = resolvePeriod(business.timezone, sp.period, sp.from, sp.to);

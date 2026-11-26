@@ -1,11 +1,12 @@
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/env";
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PROTECTED = ["/app", "/onboarding", "/reset-password", "/api/export", "/api/backup"];
+const PROTECTED = ["/app", "/admin", "/onboarding", "/reset-password", "/api/export", "/api/backup", "/api/ai", "/api/billing/checkout", "/api/billing/change", "/api/billing/portal", "/api/billing/status"];
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
-  const supabase = createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+  const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll: (list) => {

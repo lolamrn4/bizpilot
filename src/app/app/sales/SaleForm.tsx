@@ -3,13 +3,13 @@ import { useActionState, useMemo, useState } from "react";
 import { useI18n } from "@/i18n/client";
 import { fmt } from "@/i18n";
 import { ActionForm, Field, FormMessage, LockNote, SubmitButton } from "@/components/forms";
-import { DECIMALS, formatMoney, formatNumber, parseAmount, type Currency } from "@/lib/money";
+import { DECIMALS, formatMoney, formatNumber, formatPercent, parseAmount, pricing, type Currency } from "@/lib/money";
 import { PAYMENT_METHODS, type Sale } from "@/lib/types";
 import { addPaymentAction, createSaleAction, updateSaleAction } from "./actions";
 
-type ProductOpt = { id: string; name: string; sale_price: number; stock_quantity: number };
+type ProductOpt = { id: string; name: string; sale_price: number; stock_quantity: number; unit_cost?: number };
 
-export function SaleForm({ products, currency, today, sale, partialAllowed }: { products: ProductOpt[]; currency: string; today: string; sale?: Sale; partialAllowed: boolean }) {
+export function SaleForm({ products, currency, today, sale, partialAllowed, minMargin = 0.1, customers = [] }: { products: ProductOpt[]; currency: string; today: string; sale?: Sale; partialAllowed: boolean; minMargin?: number; customers?: string[] }) {
   const { d, lang } = useI18n();
   const [state, action, pending] = useActionState(sale ? updateSaleAction : createSaleAction, undefined);
   const [productId, setProductId] = useState(sale?.product_id ?? (sale ? "" : products[0]?.id ?? ""));
@@ -45,13 +45,19 @@ export function SaleForm({ products, currency, today, sale, partialAllowed }: { 
         <Field label={d.sales.quantity}><input className="input" name="quantity" type="number" min="0.001" step="any" inputMode="decimal" value={qty} onChange={(e) => setQty(e.target.value)} required /></Field>
         <Field label={`${d.sales.unitPrice} (${currency})`}><input className="input" name="unit_price" type="number" min="0" step={step} inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} required /></Field>
       </div>
+      {product && product.unit_cost !== undefined && (parseAmount(price) ?? 0) > 0 && (() => {
+        const pr = pricing(Number(product.unit_cost), parseAmount(price) ?? 0);
+        if (pr.loss) return <p className="alert-error" data-testid="sale-loss-warning">{fmt(d.pricing.saleLossWarn, { price: formatMoney(parseAmount(price) ?? 0, currency, lang), cost: formatMoney(Number(product.unit_cost), currency, lang) })}</p>;
+        if (pr.margin !== null && pr.margin < minMargin) return <p className="alert-warn">{fmt(d.pricing.saleLowWarn, { margin: formatPercent(pr.margin, lang) })}</p>;
+        return null;
+      })()}
       <div className="flex items-center justify-between rounded-2xl bg-brand-50 px-4 py-3">
         <span className="text-sm font-medium text-brand-900">{d.common.total}</span>
         <span className="text-xl font-extrabold text-brand-800">{formatMoney(total, currency, lang)}</span>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label={d.common.date}><input className="input" name="sale_date" type="date" defaultValue={sale?.sale_date ?? today} required /></Field>
-        <Field label={d.sales.customer} optional><input className="input" name="customer_name" defaultValue={sale?.customer_name} maxLength={120} /></Field>
+        <Field label={d.sales.customer} optional><input className="input" name="customer_name" defaultValue={sale?.customer_name} maxLength={120} list="customers-list" autoComplete="off" /><datalist id="customers-list">{customers.map((c) => <option key={c} value={c} />)}</datalist></Field>
         <Field label={d.sales.paymentMethod}>
           <select className="input" name="payment_method" defaultValue={sale?.payment_method ?? "cash"}>
             {PAYMENT_METHODS.map((m) => <option key={m} value={m}>{d.methods[m]}</option>)}

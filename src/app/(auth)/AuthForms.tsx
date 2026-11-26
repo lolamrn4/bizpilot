@@ -36,7 +36,7 @@ export function SignupForm() {
       </Field>
       <label className="flex items-start gap-2 text-sm text-ink-700">
         <input type="checkbox" name="terms" className="mt-0.5 size-4 accent-brand-600" required />
-        <span>{d.auth.acceptTerms}</span>
+        <span>{d.auth.acceptTerms} (<a className="underline" href="/legal/terms" target="_blank">{d.legal.terms}</a> · <a className="underline" href="/legal/privacy" target="_blank">{d.legal.privacy}</a>)</span>
       </label>
       <SubmitButton className="btn-primary w-full" pendingText={d.common.loading}>{d.auth.signup}</SubmitButton>
     </ActionForm>

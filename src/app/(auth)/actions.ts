@@ -34,7 +34,8 @@ export async function loginAction(_: ActionState, fd: FormData): Promise<ActionS
   if (error) return { error: authError(error, d) };
   const { data: p } = await supabase.from("profiles").select("language").eq("id", data.user.id).single();
   if (p?.language) await setLangCookie(p.language);
-  redirect("/app");
+  const invite = (await cookies()).get("bp_invite")?.value;
+  redirect(invite && /^[a-f0-9]{64}$/.test(invite) ? `/invite/${invite}` : "/app");
 }
 
 export async function signupAction(_: ActionState, fd: FormData): Promise<ActionState> {

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getAppContext, can } from "@/lib/session";
 import { getDict } from "@/i18n/server";
 import { fmt } from "@/i18n";
-import { resolvePeriod } from "@/lib/periods";
+import { resolvePeriod, todayIn } from "@/lib/periods";
 import { formatMoney, formatNumber } from "@/lib/money";
 import { errorMessage } from "@/lib/errors";
 import { PeriodFilter } from "@/components/PeriodFilter";
@@ -30,8 +30,46 @@ function Stat({ label, value, hint, tone = "default", href }: { label: string; v
   return href ? <Link href={href} className="block transition hover:-translate-y-0.5">{body}</Link> : body;
 }
 
+/** Accueil d'un vendeur : actions rapides et ses propres ventes du jour (pas de chiffres globaux). */
+async function StaffHome() {
+  const { business, supabase, profile, user } = await getAppContext();
+  const { d, lang } = await getDict();
+  const today = todayIn(business.timezone);
+  const { data } = await supabase.from("sales").select("id, item_name, total, currency, status, quantity")
+    .eq("business_id", business.id).eq("created_by", user.id).eq("sale_date", today).order("created_at", { ascending: false }).limit(50);
+  const sales = data ?? [];
+  return (
+    <div className="space-y-5">
+      <div>
+        <h1 className="h1">{fmt(d.staffHome.title, { name: profile.full_name || "" }).trim()}</h1>
+        <p className="text-sm text-ink-500">{fmt(d.staffHome.subtitle, { business: business.name })}</p>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Link href="/app/sales/new" className="btn-primary py-4 text-base">+ {d.nav.newSale}</Link>
+        <Link href="/app/expenses/new" className="btn-secondary py-4 text-base">+ {d.staffHome.newExpense}</Link>
+      </div>
+      <section className="card p-5" data-testid="staff-home">
+        <h2 className="h2 mb-1">{d.staffHome.mySales}</h2>
+        <p className="mb-3 text-xs text-ink-500">{fmt(d.staffHome.count, { n: sales.length })}</p>
+        {sales.length === 0 ? <p className="text-sm text-ink-500">{d.staffHome.none}</p> : (
+          <ul className="divide-y divide-ink-100">
+            {sales.map((x) => (
+              <li key={x.id}><Link href={`/app/sales/${x.id}`} className="flex items-center justify-between gap-3 py-2.5 text-sm hover:bg-ink-50">
+                <span className="truncate">{x.item_name} × {formatNumber(x.quantity, lang)}</span>
+                <b>{formatMoney(x.total, x.currency, lang)}</b>
+              </Link></li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
+  );
+}
+
 export default async function Dashboard({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
-  const { business, supabase, profile, entitlements } = await getAppContext();
+  const ctx = await getAppContext();
+  if (!ctx.isManager) return <StaffHome />;
+  const { business, supabase, profile, entitlements } = ctx;
   const { d, lang } = await getDict();
   const sp = await searchParams;
   const allPeriods = can(entitlements, "all_periods");
@@ -40,6 +78,9 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const s = data as Summary | null;
   const m = (v: number) => formatMoney(v, business.currency, lang);
   const firstName = (profile.full_name || "").split(" ")[0];
+  const { count: urgent } = can(entitlements, "coach")
+    ? await supabase.from("recommendations").select("id", { count: "exact", head: true }).eq("business_id", business.id).eq("status", "open")
+    : { count: 0 };
 
   return (
     <div className="space-y-5">
@@ -47,6 +88,11 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         <h1 className="h1">{firstName ? fmt(d.dashboard.hello, { name: firstName }) : d.nav.dashboard}</h1>
         <p className="text-sm text-ink-500">{business.name}</p>
       </div>
+      {(urgent ?? 0) > 0 && (
+        <Link href="/app/coach" className="alert-info flex items-center justify-between gap-3 font-medium">
+          <span>💡 {d.coach.title} : {urgent} {d.coach.open.toLowerCase()}</span><span aria-hidden="true">→</span>
+        </Link>
+      )}
       <PeriodFilter period={p.period} from={p.from} to={p.to} allPeriods={allPeriods} />
       {error && <p className="alert-error">{errorMessage(error, d)}</p>}
       {s && (

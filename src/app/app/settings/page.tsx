@@ -1,16 +1,22 @@
-import { getAppContext } from "@/lib/session";
+import Link from "next/link";
+import { getAppContext, can } from "@/lib/session";
 import { getDict } from "@/i18n/server";
 import { logoutAction } from "@/app/(auth)/actions";
-import { BusinessForm, PasswordForm, ProfileForm } from "./SettingsForms";
+import { BusinessForm, PasswordForm, ProfileForm, ReceiptForm } from "./SettingsForms";
+import { removeLogoAction } from "./actions";
+import { logoUrl } from "@/lib/receipt";
+import { leaveBusinessAction } from "../team/actions";
+import { ConfirmSubmit } from "../team/TeamForms";
 
 export default async function SettingsPage() {
-  const { user, profile, business, supabase, entitlements } = await getAppContext();
+  const { user, profile, business, supabase, entitlements, isOwner, role } = await getAppContext();
   const { d } = await getDict();
   const [{ count: s }, { count: e }, { count: p }] = await Promise.all([
     supabase.from("sales").select("id", { count: "exact", head: true }).eq("business_id", business.id),
     supabase.from("expenses").select("id", { count: "exact", head: true }).eq("business_id", business.id),
     supabase.from("products").select("id", { count: "exact", head: true }).eq("business_id", business.id),
   ]);
+  const { data: isAdmin } = await supabase.rpc("is_platform_admin");
   const currencyLocked = (s ?? 0) + (e ?? 0) + (p ?? 0) > 0;
   const lim = entitlements.limits;
   const usage = [
@@ -35,11 +41,29 @@ export default async function SettingsPage() {
             </div>
           ))}
         </div>
-        <p className="mt-4 text-xs text-ink-500">{d.plans.paymentsSoon}</p>
+        {isOwner && <Link href="/app/billing" className="btn-primary mt-4">{d.nav.billing}</Link>}
       </section>
       <section className="card p-5"><h2 className="h2 mb-4">{d.settings.profile}</h2><ProfileForm fullName={profile.full_name} email={user.email ?? ""} /></section>
-      <section className="card p-5"><h2 className="h2 mb-4">{d.settings.business}</h2><BusinessForm business={business} currencyLocked={currencyLocked} /></section>
+      {isOwner ? (
+        <>
+          <section className="card p-5"><h2 className="h2 mb-4">{d.settings.business}</h2><BusinessForm business={business} currencyLocked={currencyLocked} /></section>
+          <section className="card p-5" id="receipts">
+            <h2 className="h2 mb-2">{d.receipt.settingsTitle}</h2>
+            <ReceiptForm business={business} branded={can(entitlements, "custom_receipts")} logoUrl={logoUrl(business.logo_path ?? null)} />
+            {business.logo_path && can(entitlements, "custom_receipts") && (
+              <form action={removeLogoAction} className="mt-3"><button className="btn-ghost px-2 py-1 text-xs text-red-700">{d.receipt.removeLogo}</button></form>
+            )}
+          </section>
+        </>
+      ) : (
+        <section className="card p-5">
+          <h2 className="h2 mb-1">{d.settings.business}</h2>
+          <p className="mb-4 text-sm text-ink-600">{business.name} · {d.roles[role]}</p>
+          <form action={leaveBusinessAction}><ConfirmSubmit label={d.team.leave} message={d.team.leaveConfirm} className="btn-danger" /></form>
+        </section>
+      )}
       <section className="card p-5"><h2 className="h2 mb-4">{d.settings.security}</h2><PasswordForm /></section>
+      {isAdmin && <Link href="/admin" className="btn-secondary w-full sm:w-auto">⚙️ {d.admin.title}</Link>}
       <section className="card p-5">
         <h2 className="h2 mb-3">{d.settings.dangerZone}</h2>
         <form action={logoutAction}><button className="btn-secondary">{d.auth.logout}</button></form>
