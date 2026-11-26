@@ -4,6 +4,7 @@ import { getDict } from "@/i18n/server";
 import { Icon, ICONS } from "@/components/AppNav";
 import { BusinessSwitcher } from "@/components/BusinessSwitcher";
 import { logoutAction } from "@/app/(auth)/actions";
+import { InstallCard } from "@/components/InstallApp";
 
 export default async function MorePage() {
   const { isManager, isOwner, businesses, business, entitlements } = await getAppContext();
@@ -34,7 +35,9 @@ export default async function MorePage() {
           </Link>
         ))}
       </div>
+      <InstallCard />
       <form action={logoutAction}><button className="btn-secondary w-full">{d.auth.logout}</button></form>
     </div>
   );
 }
+

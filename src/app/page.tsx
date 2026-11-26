@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatMoney } from "@/lib/money";
 import { LegalFooter } from "@/components/LegalFooter";
 import { getDisplayPrices } from "@/lib/prices";
+import { InstallButton, InstallGuide } from "@/components/InstallApp";
 
 const icons = [
   "M3 3h18v4H3zM5 7v13h14V7M9 12h6",
@@ -41,7 +42,8 @@ export default async function Landing() {
           <p className="mt-3 max-w-2xl text-sm font-medium text-brand-700">{d.brand.slogan}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/signup" className="btn-primary px-6 py-3 text-base">{d.landing.start}</Link>
-            <Link href="/login" className="btn-secondary px-6 py-3 text-base">{d.landing.login}</Link>
+            <InstallButton />
+            <Link href="/login" className="btn-ghost px-6 py-3 text-base">{d.landing.login}</Link>
           </div>
         </div>
       </section>
@@ -57,6 +59,14 @@ export default async function Landing() {
               <p className="mt-1.5 text-sm text-ink-600">{d.landing[`f${i}d`]}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section id="installer" className="scroll-mt-4 py-16">
+        <div className="mx-auto max-w-6xl px-5">
+          <h2 className="text-2xl font-bold tracking-tight">{d.pwa.installTitle}</h2>
+          <p className="mt-1 max-w-2xl text-sm text-ink-500">{d.pwa.installText}</p>
+          <div className="mt-8"><InstallGuide /></div>
         </div>
       </section>
 
