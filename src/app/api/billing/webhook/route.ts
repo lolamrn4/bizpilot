@@ -13,7 +13,7 @@ type PaddleEvent = { event_id?: string; event_type?: string; occurred_at?: strin
  */
 export async function POST(req: NextRequest) {
   const raw = await req.text();
-  const secret = process.env.PADDLE_WEBHOOK_SECRET ?? "";
+  const secret = (process.env.PADDLE_WEBHOOK_SECRET ?? "").trim();
   if (!verifyPaddleSignature(raw, req.headers.get("paddle-signature"), secret)) {
     return NextResponse.json({ error: "invalid signature" }, { status: 401 });
   }

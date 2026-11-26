@@ -29,7 +29,7 @@ export class PaddleError extends Error {
 export async function paddle<T = unknown>(method: "GET" | "POST" | "PATCH", path: string, body?: unknown): Promise<T> {
   const res = await fetch(apiBase() + path, {
     method,
-    headers: { authorization: `Bearer ${process.env.PADDLE_API_KEY}`, "content-type": "application/json" },
+    headers: { authorization: `Bearer ${(process.env.PADDLE_API_KEY ?? "").trim()}`, "content-type": "application/json" },
     body: body === undefined ? undefined : JSON.stringify(body),
     signal: AbortSignal.timeout(20000),
     cache: "no-store",
