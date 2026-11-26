@@ -39,7 +39,7 @@
 5. `/admin/billing` → « Créer les produits et prix dans Paddle ».
    - Les clés doivent être copiées **révélées** (jamais la version masquée « ••• »). Après toute modification d'une variable Vercel, redéployer.
 6. Tester avec une carte de test Paddle (sandbox) depuis `/app/billing`.
-7. Passage en réel : refaire 3 à 5 sur https://vendors.paddle.com avec `NEXT_PUBLIC_PADDLE_ENV=production`, après approbation du compte et du domaine par Paddle.
+7. Passage en réel (fait le 26/11/2026 : compte vérifié, domaine www.bizpilotappgn.xyz approuvé) : refaire 3 à 5 sur https://vendors.paddle.com avec `NEXT_PUBLIC_PADDLE_ENV=production`, après approbation du compte et du domaine par Paddle.
 
 ## Phase 4 — Espace admin (`/admin`, propriétaire uniquement)
 - Tableau de bord : utilisateurs, inscriptions, entreprises actives, abonnés payants, revenu mensuel estimé, activité, erreurs.
