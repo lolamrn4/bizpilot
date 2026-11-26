@@ -60,7 +60,7 @@ export default async function Landing() {
         </div>
       </section>
 
-      <section className="py-16">
+      <section id="pricing" className="scroll-mt-4 py-16">
         <div className="mx-auto max-w-6xl px-5">
           <h2 className="text-2xl font-bold tracking-tight">{d.landing.plansTitle}</h2>
           <p className="mt-1 text-sm text-ink-500">{d.landing.plansNote}</p>
